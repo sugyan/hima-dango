@@ -1,5 +1,5 @@
 use env_logger::Env;
-use hima_dango::{Algorithm, Field, Graph};
+use hima_dango::{Field, Graph};
 use std::{cmp::Ordering, time::Instant};
 
 fn main() {
@@ -10,33 +10,41 @@ fn main() {
     let graph = Graph::new(nodes, field.max_len);
     log::debug!(
         "{} nodes, {} edges",
-        graph.len(),
-        graph.values().map(Vec::len).sum::<usize>()
+        graph.nodes.len(),
+        graph.edges.iter().map(Vec::len).sum::<usize>()
     );
-    let distances = {
+    let all_distances = {
         let now = Instant::now();
-        // let result = graph.distances(Algorithm::FloydWarshall);
-        let result = graph.distances(Algorithm::Dijkstra);
+        let ret = (0..graph.nodes.len())
+            .map(|i| graph.distances(i))
+            .collect::<Vec<_>>();
         log::debug!(
             "elapsed time for calculating distances: {:?}",
             now.elapsed()
         );
-        result
+        ret
     };
+
     let (mut max, mut paths) = (0, Vec::new());
-    for ((src, dst), d) in distances {
-        // if src.iter().any(|s| s.len() == 1) || dst.iter().any(|s| s.len() == 1) {
-        //     continue;
-        // }
-        match d.cmp(&max) {
-            Ordering::Greater => {
-                max = d;
-                paths = vec![(src.clone(), dst.clone())];
+    for (i, distances) in all_distances.iter().enumerate() {
+        let src = &graph.nodes[i];
+        for (j, &distance) in distances.iter().enumerate() {
+            let dst = &graph.nodes[j];
+            // if src.iter().any(|s| s.len() == 1) || dst.iter().any(|s| s.len() == 1) {
+            //     continue;
+            // }
+            if let Some(d) = distance {
+                match d.cmp(&max) {
+                    Ordering::Greater => {
+                        max = d;
+                        paths = vec![(src.clone(), dst.clone())];
+                    }
+                    Ordering::Equal => {
+                        paths.push((src.clone(), dst.clone()));
+                    }
+                    _ => {}
+                }
             }
-            Ordering::Equal => {
-                paths.push((src.clone(), dst.clone()));
-            }
-            _ => {}
         }
     }
     log::info!("max distance: {max} ({} paths)", paths.len());

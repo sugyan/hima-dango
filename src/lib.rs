@@ -1,7 +1,7 @@
 mod enumerations;
 mod graph;
 
-pub use graph::{Algorithm, Graph};
+pub use graph::Graph;
 use std::ops::Deref;
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
