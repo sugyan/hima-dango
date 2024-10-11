@@ -3,10 +3,14 @@ mod graph;
 
 pub use graph::Graph;
 use std::ops::Deref;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::wasm_bindgen;
 
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct Stacks(Vec<Vec<u8>>);
 
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 impl Stacks {
     pub fn next_stacks(&self, max_len: usize) -> Vec<Stacks> {
         let mut results = Vec::new();
@@ -23,6 +27,13 @@ impl Stacks {
         }
         results
     }
+    #[cfg(target_arch = "wasm32")]
+    pub fn to_values(&self) -> Vec<wasm_bindgen::JsValue> {
+        self.0
+            .iter()
+            .map(|v| wasm_bindgen::JsValue::from(v.clone()))
+            .collect()
+    }
 }
 
 impl Deref for Stacks {
@@ -33,37 +44,39 @@ impl Deref for Stacks {
     }
 }
 
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 pub struct Field {
-    pub max_len: usize,
-    pub stacks: Stacks,
+    stacks: Stacks,
+    max_len: usize,
 }
 
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 impl Field {
-    pub fn new(max_len: usize, num_stacks: usize) -> Self {
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(constructor))]
+    pub fn new(num_stacks: usize, max_len: usize) -> Self {
         Field {
-            max_len,
             stacks: Stacks(vec![Vec::with_capacity(max_len); num_stacks]),
+            max_len,
         }
     }
-    pub fn all_stacks(&self, balls: Vec<u8>) -> Vec<Stacks> {
-        let permutations = enumerations::unique_permutations(balls.clone());
-        enumerations::bounded_partitions(
-            self.stacks.0.len(),
-            self.max_len as u32,
-            balls.len() as u32,
-        )
-        .iter()
-        .flat_map(|partition| {
-            permutations.clone().into_iter().map(|p| {
-                let mut iter = p.into_iter();
-                Stacks(
-                    partition
-                        .iter()
-                        .map(|&n| iter.by_ref().take(n as usize).collect())
-                        .collect(),
-                )
-            })
-        })
-        .collect()
+    pub fn make_graph(&self, balls: Vec<u8>) -> Graph {
+        let target_sum = balls.len() as u32;
+        let permutations = enumerations::unique_permutations(balls);
+        let all_stacks =
+            enumerations::bounded_partitions(self.stacks.len(), self.max_len as u32, target_sum)
+                .iter()
+                .flat_map(|partition| {
+                    permutations.clone().into_iter().map(|p| {
+                        let mut iter = p.into_iter();
+                        Stacks(
+                            partition
+                                .iter()
+                                .map(|&n| iter.by_ref().take(n as usize).collect())
+                                .collect(),
+                        )
+                    })
+                })
+                .collect();
+        Graph::new(all_stacks, self.max_len)
     }
 }

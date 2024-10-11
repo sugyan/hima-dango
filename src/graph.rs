@@ -1,14 +1,24 @@
 use crate::Stacks;
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashMap};
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 pub struct Graph {
-    pub nodes: Vec<Stacks>,
-    pub edges: Vec<Vec<usize>>,
+    nodes: Vec<Stacks>,
+    edges: Vec<Vec<usize>>,
 }
 
+#[derive(Default, Clone, Copy)]
+pub struct PathInfo {
+    pub dist: Option<u32>,
+    pub prev: Option<usize>,
+}
+
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 impl Graph {
-    pub fn new(nodes: Vec<Stacks>, max_len: usize) -> Self {
+    pub(crate) fn new(nodes: Vec<Stacks>, max_len: usize) -> Self {
         let mut edges = vec![Vec::with_capacity(6); nodes.len()];
         let node_map = nodes
             .iter()
@@ -22,19 +32,57 @@ impl Graph {
         }
         Self { nodes, edges }
     }
-    pub fn distances(&self, src: usize) -> Vec<Option<u32>> {
-        let mut distances = vec![None; self.nodes.len()];
+    pub fn nodes_len(&self) -> usize {
+        self.nodes.len()
+    }
+    pub fn edges_len(&self) -> usize {
+        self.edges.iter().map(Vec::len).sum()
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn node(&self, i: usize) -> &Stacks {
+        &self.nodes[i]
+    }
+    #[cfg(target_arch = "wasm32")]
+    pub fn node(&self, i: usize) -> Stacks {
+        self.nodes[i].clone()
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn paths(&self, src: usize) -> Vec<PathInfo> {
+        self.dijkstra(src)
+    }
+    #[cfg(target_arch = "wasm32")]
+    pub fn paths(&self, src: usize) -> JsValue {
+        let paths = self.dijkstra(src);
+        let dists = JsValue::from(
+            paths
+                .iter()
+                .map(|info| info.dist.map_or(JsValue::NULL, JsValue::from))
+                .collect::<Vec<_>>(),
+        );
+        let prevs = JsValue::from(
+            paths
+                .iter()
+                .map(|info| info.prev.map_or(JsValue::NULL, JsValue::from))
+                .collect::<Vec<_>>(),
+        );
+        JsValue::from(vec![dists, prevs])
+    }
+    fn dijkstra(&self, src: usize) -> Vec<PathInfo> {
+        let mut results = vec![PathInfo::default(); self.nodes.len()];
         let mut bh = BinaryHeap::new();
-        distances[src] = Some(0);
+        results[src].dist = Some(0);
         bh.push((Reverse(0), src));
         while let Some((Reverse(d), i)) = bh.pop() {
             for &j in &self.edges[i] {
-                if distances[j].is_none() {
-                    distances[j] = Some(d + 1);
+                if results[j].dist.is_none() {
+                    results[j] = PathInfo {
+                        dist: Some(d + 1),
+                        prev: Some(i),
+                    };
                     bh.push((Reverse(d + 1), j));
                 }
             }
         }
-        distances
+        results
     }
 }
