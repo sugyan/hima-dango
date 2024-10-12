@@ -8,11 +8,11 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
-pub struct Stacks(Vec<Vec<u8>>);
+pub struct State(Vec<Vec<u8>>);
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
-impl Stacks {
-    pub fn next_stacks(&self, max_len: usize) -> Vec<Stacks> {
+impl State {
+    pub fn next_stacks(&self, max_len: usize) -> Vec<State> {
         let mut results = Vec::new();
         for i in 0..self.0.len() {
             for j in 0..self.0.len() {
@@ -22,7 +22,7 @@ impl Stacks {
                 let mut v = self.0.clone();
                 let ball = v[i].pop().unwrap();
                 v[j].push(ball);
-                results.push(Stacks(v));
+                results.push(State(v));
             }
         }
         results
@@ -36,7 +36,7 @@ impl Stacks {
     }
 }
 
-impl Deref for Stacks {
+impl Deref for State {
     type Target = Vec<Vec<u8>>;
 
     fn deref(&self) -> &Self::Target {
@@ -46,7 +46,7 @@ impl Deref for Stacks {
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 pub struct Field {
-    stacks: Stacks,
+    num_stacks: usize,
     max_len: usize,
 }
 
@@ -55,7 +55,7 @@ impl Field {
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen(constructor))]
     pub fn new(num_stacks: usize, max_len: usize) -> Self {
         Field {
-            stacks: Stacks(vec![Vec::with_capacity(max_len); num_stacks]),
+            num_stacks,
             max_len,
         }
     }
@@ -63,12 +63,12 @@ impl Field {
         let target_sum = balls.len() as u32;
         let permutations = enumerations::unique_permutations(balls);
         let all_stacks =
-            enumerations::bounded_partitions(self.stacks.len(), self.max_len as u32, target_sum)
+            enumerations::bounded_partitions(self.num_stacks, self.max_len as u32, target_sum)
                 .iter()
                 .flat_map(|partition| {
                     permutations.clone().into_iter().map(|p| {
                         let mut iter = p.into_iter();
-                        Stacks(
+                        State(
                             partition
                                 .iter()
                                 .map(|&n| iter.by_ref().take(n as usize).collect())

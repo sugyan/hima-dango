@@ -1,10 +1,10 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 pub fn unique_permutations(elems: Vec<u8>) -> Vec<Vec<u8>> {
     fn backtrack(
         n: usize,
         curr: &mut Vec<u8>,
-        counts: &mut HashMap<u8, u32>,
+        counts: &mut BTreeMap<u8, u32>,
         result: &mut Vec<Vec<u8>>,
     ) {
         if n == 0 {
@@ -23,7 +23,7 @@ pub fn unique_permutations(elems: Vec<u8>) -> Vec<Vec<u8>> {
     }
 
     let mut result = Vec::new();
-    let mut counts = HashMap::with_capacity(256);
+    let mut counts = BTreeMap::new();
     for &elem in &elems {
         *counts.entry(elem).or_insert(0) += 1;
     }

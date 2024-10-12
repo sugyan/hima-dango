@@ -1,4 +1,4 @@
-use crate::Stacks;
+use crate::State;
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashMap};
 #[cfg(target_arch = "wasm32")]
@@ -6,7 +6,7 @@ use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 pub struct Graph {
-    nodes: Vec<Stacks>,
+    nodes: Vec<State>,
     edges: Vec<Vec<usize>>,
 }
 
@@ -18,7 +18,7 @@ pub struct PathInfo {
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 impl Graph {
-    pub(crate) fn new(nodes: Vec<Stacks>, max_len: usize) -> Self {
+    pub(crate) fn new(nodes: Vec<State>, max_len: usize) -> Self {
         let mut edges = vec![Vec::with_capacity(6); nodes.len()];
         let node_map = nodes
             .iter()
@@ -39,11 +39,11 @@ impl Graph {
         self.edges.iter().map(Vec::len).sum()
     }
     #[cfg(not(target_arch = "wasm32"))]
-    pub fn node(&self, i: usize) -> &Stacks {
+    pub fn node(&self, i: usize) -> &State {
         &self.nodes[i]
     }
     #[cfg(target_arch = "wasm32")]
-    pub fn node(&self, i: usize) -> Stacks {
+    pub fn node(&self, i: usize) -> State {
         self.nodes[i].clone()
     }
     #[cfg(not(target_arch = "wasm32"))]
