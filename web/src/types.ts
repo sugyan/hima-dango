@@ -1,7 +1,7 @@
 export const Color = {
   Green: 0,
   White: 1,
-  Red: 2,
+  Pink: 2,
 } as const;
 export type Color = (typeof Color)[keyof typeof Color];
 
@@ -15,7 +15,7 @@ export class Dango {
     return {
       [Color.Green]: "bg-green-400",
       [Color.White]: "bg-white",
-      [Color.Red]: "bg-red-400",
+      [Color.Pink]: "bg-pink-300",
     }[this.color];
   }
   equals(other: Dango) {

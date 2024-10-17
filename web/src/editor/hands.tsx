@@ -1,6 +1,6 @@
 import { useDroppable } from "@dnd-kit/core";
+import { Dango } from "../types";
 import DraggableDango from "./draggable-dango";
-import { Dango } from "./types";
 
 export const ID_HANDS = "hand";
 

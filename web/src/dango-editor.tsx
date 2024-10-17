@@ -1,8 +1,8 @@
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
 import { ALL_DANGOS } from "./constants";
-import Hands, { ID_HANDS } from "./hands";
-import Skewer from "./skewer";
+import Hands, { ID_HANDS } from "./editor/hands";
+import Skewer from "./editor/skewer";
 import { Color, Dango } from "./types";
 
 const DangoEditor = ({

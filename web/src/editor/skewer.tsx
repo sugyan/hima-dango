@@ -1,7 +1,7 @@
 import { useDroppable } from "@dnd-kit/core";
+import { ALL_DANGOS } from "../constants";
+import { Dango } from "../types";
 import DraggableDango from "./draggable-dango";
-import { Dango } from "./types";
-import { ALL_DANGOS } from "./constants";
 
 const Skewer = ({ id, dangos }: { id: number; dangos: Dango[] }) => {
   const { active, isOver, setNodeRef } = useDroppable({
@@ -14,7 +14,7 @@ const Skewer = ({ id, dangos }: { id: number; dangos: Dango[] }) => {
   return (
     <div ref={setNodeRef}>
       <div className="relative flex flex-col items-center m-4 mt-8">
-        <div className="z-0 rounded-t w-1 h-48 sm:h-60 bg-gray-800"></div>
+        <div className="z-0 rounded-t w-0.5 h-44 sm:w-1 sm:h-60 bg-gray-800"></div>
         {droppable && (
           <div
             className={`absolute top-${28 - 12 * dangos.length} sm:top-${

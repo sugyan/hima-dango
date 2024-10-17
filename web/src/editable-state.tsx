@@ -1,9 +1,16 @@
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import DangoEditor from "./dango-editor";
 import { Color, Dango } from "./types";
+import DangoViewer from "./dango-viewer";
 
-const EditableState = () => {
+const EditableState = ({
+  initColors,
+  onUpdated,
+}: {
+  initColors?: Color[][];
+  onUpdated: (colors: Color[][]) => void;
+}) => {
   const [colors, setColors] = useState<Color[][]>([[], [], []]);
   const [fixedColors, setFixedColors] = useState<Color[][]>([[], [], []]);
   const [isOpen, setIsOpen] = useState(false);
@@ -16,11 +23,24 @@ const EditableState = () => {
   }, []);
   const onOk = () => {
     setFixedColors(colors);
+    onUpdated(colors);
     setIsOpen(false);
   };
+  useEffect(() => {
+    if (initColors) {
+      setFixedColors(initColors);
+    }
+  }, [initColors]);
   return (
     <>
-      <button onClick={() => setIsOpen(true)}>button {fixedColors}</button>
+      <div className="flex flex-col items-center">
+        <div>
+          <button onClick={() => setIsOpen(true)}>
+            <DangoViewer colors={fixedColors} />
+            <div className="m-1 text-gray-400">Edit</div>
+          </button>
+        </div>
+      </div>
       <Dialog
         open={isOpen}
         onClose={() => setIsOpen(false)}
