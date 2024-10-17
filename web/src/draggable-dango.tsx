@@ -14,7 +14,7 @@ const DraggableDango = ({ dango }: { dango: Dango }) => {
       {...attributes}
     >
       <div
-        className={`w-16 h-16 rounded-full border border-gray-600 ${dango.bgColor()}`}
+        className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full border border-gray-600 ${dango.bgColor()}`}
       />
     </div>
   );

@@ -14,22 +14,22 @@ const Skewer = ({ id, dangos }: { id: number; dangos: Dango[] }) => {
   return (
     <div ref={setNodeRef}>
       <div className="relative flex flex-col items-center m-4 mt-8">
-        <div className="z-0 rounded-t w-1 h-60 bg-gray-800"></div>
+        <div className="z-0 rounded-t w-1 h-48 sm:h-60 bg-gray-800"></div>
         {droppable && (
           <div
-            className={`absolute top-${
+            className={`absolute top-${28 - 12 * dangos.length} sm:top-${
               36 - 16 * dangos.length
             } left-1/2 transform -translate-x-1/2`}
           >
             <div
-              className={`w-16 h-16 rounded-full border border-dashed border-gray-400 ${color}`}
+              className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full border border-dashed border-gray-400 ${color}`}
             />
           </div>
         )}
         {dangos.map((dango, i) => (
           <div
             key={i}
-            className={`z-10 absolute top-${
+            className={`z-10 absolute top-${28 - 12 * i} sm:top-${
               36 - 16 * i
             } left-1/2 transform -translate-x-1/2`}
           >

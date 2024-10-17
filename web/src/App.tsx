@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import init, { Field, Graph } from "../pkg/hima_dango";
-import DangoEditor from "./dango-editor";
+import EditableState from "./editable-state";
 
 // (async () => {
 //   await init();
@@ -35,7 +33,10 @@ function App() {
         {/* {result ? (
           <div className="font-mono">{JSON.stringify(result)}</div>
         ) : null} */}
-        <DangoEditor />
+        <div className="flex space-x-4">
+          <EditableState />
+          <EditableState />
+        </div>
       </div>
     </div>
   );

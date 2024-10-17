@@ -5,4 +5,10 @@ export default {
     extend: {},
   },
   plugins: [],
+  safelist: [
+    {
+      pattern: /^top-/,
+      variants: ["sm"],
+    },
+  ],
 };
