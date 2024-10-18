@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import init, { Field, Graph } from "../pkg/hima_dango";
 import DangoViewer from "./dango-viewer";
 import EditableState from "./editable-state";
+import Footer from "./footer";
 import { Color } from "./types";
 import { colors2string, solve, string2colors } from "./utils";
 
@@ -54,7 +55,7 @@ function App() {
   };
   return (
     <div className="bg-slate-800 text-slate-200 min-h-screen">
-      <div className="max-w-screen-lg mx-auto py-4 flex flex-col items-center">
+      <div className="max-w-screen-md mx-auto py-4 flex flex-col items-center">
         <h1 className="font-mono text-2xl mb-2">Dango Solver</h1>
         <div className="flex space-x-4 sm:space-x-8 m-4 justify-center items-center">
           <div className="w-1/2">
@@ -88,6 +89,7 @@ function App() {
             </div>
           </>
         )}
+        <Footer />
       </div>
     </div>
   );

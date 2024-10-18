@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { Color } from "./types";
-import { colors2string } from "./utils";
 
 const DangoViewer = ({ colors }: { colors: Color[][] }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
