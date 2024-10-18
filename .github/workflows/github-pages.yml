@@ -25,9 +25,6 @@ concurrency:
 jobs:
   # Single deploy job since we're just deploying
   deploy:
-    defaults:
-      run:
-        working-directory: "./web"
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -44,17 +41,19 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: npm ci
+        working-directory: "./web"
       - name: Build
         env:
           VITE_BASENAME: "/$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)"
         run: npm run build
+        working-directory: "./web"
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload dist folder
-          path: "./dist"
+          path: "./web/dist"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
