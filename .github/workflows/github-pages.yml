@@ -4,7 +4,9 @@ name: Deploy static content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ['main']
+    branches: ["main"]
+    paths:
+      - "web/**"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -17,12 +19,15 @@ permissions:
 
 # Allow one concurrent deployment
 concurrency:
-  group: 'pages'
+  group: "pages"
   cancel-in-progress: true
 
 jobs:
   # Single deploy job since we're just deploying
   deploy:
+    defaults:
+      run:
+        working-directory: "./web"
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -34,10 +39,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
       - name: Install dependencies
         run: npm ci
       - name: Build
+        env:
+          VITE_BASENAME: "/$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)"
         run: npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -45,7 +52,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload dist folder
-          path: './dist'
+          path: "./dist"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
