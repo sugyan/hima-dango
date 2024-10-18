@@ -41,9 +41,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: "./web"
+      - name: Set VITE_BASENAME environment variable
+        run: echo "VITE_BASENAME=/${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
       - name: Build
-        env:
-          VITE_BASENAME: "/$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)"
         run: npm run build
         working-directory: "./web"
       - name: Setup Pages
