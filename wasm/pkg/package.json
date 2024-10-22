@@ -1,0 +1,15 @@
+{
+  "name": "hima-dango-wasm",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "hima_dango_wasm_bg.wasm",
+    "hima_dango_wasm.js",
+    "hima_dango_wasm.d.ts"
+  ],
+  "main": "hima_dango_wasm.js",
+  "types": "hima_dango_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

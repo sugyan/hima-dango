@@ -1,20 +1,9 @@
 /* tslint:disable */
 /* eslint-disable */
-export class Field {
+export function init(): void;
+export class WasmGraph {
   free(): void;
-  /**
-   * @param {number} num_stacks
-   * @param {number} max_len
-   */
-  constructor(num_stacks: number, max_len: number);
-  /**
-   * @param {Uint8Array} balls
-   * @returns {Graph}
-   */
-  make_graph(balls: Uint8Array): Graph;
-}
-export class Graph {
-  free(): void;
+  constructor();
   /**
    * @returns {number}
    */
@@ -25,46 +14,34 @@ export class Graph {
   edges_len(): number;
   /**
    * @param {number} i
-   * @returns {State}
+   * @returns {any}
    */
-  node(i: number): State;
+  node(i: number): any;
   /**
    * @param {number} src
    * @returns {any}
    */
   paths(src: number): any;
 }
-export class State {
-  free(): void;
-  /**
-   * @param {number} max_len
-   * @returns {(State)[]}
-   */
-  next_stacks(max_len: number): (State)[];
-  /**
-   * @returns {any[]}
-   */
-  to_values(): any[];
-}
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly __wbg_state_free: (a: number, b: number) => void;
-  readonly state_next_stacks: (a: number, b: number, c: number) => void;
-  readonly state_to_values: (a: number, b: number) => void;
-  readonly __wbg_field_free: (a: number, b: number) => void;
-  readonly field_new: (a: number, b: number) => number;
-  readonly field_make_graph: (a: number, b: number, c: number) => number;
-  readonly __wbg_graph_free: (a: number, b: number) => void;
-  readonly graph_nodes_len: (a: number) => number;
-  readonly graph_edges_len: (a: number) => number;
-  readonly graph_node: (a: number, b: number) => number;
-  readonly graph_paths: (a: number, b: number) => number;
+  readonly init: () => void;
+  readonly __wbg_wasmgraph_free: (a: number, b: number) => void;
+  readonly wasmgraph_new: () => number;
+  readonly wasmgraph_nodes_len: (a: number) => number;
+  readonly wasmgraph_edges_len: (a: number) => number;
+  readonly wasmgraph_node: (a: number, b: number) => number;
+  readonly wasmgraph_paths: (a: number, b: number) => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
-  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
+  readonly __wbindgen_export_1: WebAssembly.Table;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
+  readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbindgen_exn_store: (a: number) => void;
+  readonly __externref_table_alloc: () => number;
+  readonly __wbindgen_start: () => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;

@@ -1,12 +1,10 @@
 use crate::State;
+use ahash::AHashMap;
 use std::cmp::Reverse;
-use std::collections::{BinaryHeap, HashMap};
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
+use std::collections::BinaryHeap;
 
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
-pub struct Graph {
-    nodes: Vec<State>,
+pub struct Graph<const LEN: usize> {
+    nodes: Vec<State<LEN>>,
     edges: Vec<Vec<usize>>,
 }
 
@@ -16,18 +14,22 @@ pub struct PathInfo {
     pub prev: Option<usize>,
 }
 
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
-impl Graph {
-    pub(crate) fn new(nodes: Vec<State>, max_len: usize) -> Self {
-        let mut edges = vec![Vec::with_capacity(6); nodes.len()];
+impl<const LEN: usize> Graph<LEN> {
+    pub(crate) fn new(nodes: Vec<State<LEN>>, max_len: usize) -> Self {
+        log::debug!("all nodes: {}", nodes.len());
+        let mut edges = vec![Vec::with_capacity(LEN * (LEN - 1)); nodes.len()];
         let node_map = nodes
             .iter()
             .enumerate()
             .map(|(i, node)| (node, i))
-            .collect::<HashMap<_, _>>();
-        for src in &nodes {
-            for dst in src.next_stacks(max_len) {
-                edges[node_map[src]].push(node_map[&dst]);
+            .collect::<AHashMap<_, _>>();
+
+        for (i, src) in nodes.iter().enumerate() {
+            if i % 1_000_000 == 0 {
+                log::debug!("{} nodes processed", i);
+            }
+            for dst in &src.next_stacks(max_len) {
+                edges[i].push(node_map[dst]);
             }
         }
         Self { nodes, edges }
@@ -38,36 +40,10 @@ impl Graph {
     pub fn edges_len(&self) -> usize {
         self.edges.iter().map(Vec::len).sum()
     }
-    #[cfg(not(target_arch = "wasm32"))]
-    pub fn node(&self, i: usize) -> &State {
+    pub fn node(&self, i: usize) -> &State<LEN> {
         &self.nodes[i]
     }
-    #[cfg(target_arch = "wasm32")]
-    pub fn node(&self, i: usize) -> State {
-        self.nodes[i].clone()
-    }
-    #[cfg(not(target_arch = "wasm32"))]
     pub fn paths(&self, src: usize) -> Vec<PathInfo> {
-        self.dijkstra(src)
-    }
-    #[cfg(target_arch = "wasm32")]
-    pub fn paths(&self, src: usize) -> JsValue {
-        let paths = self.dijkstra(src);
-        let dists = JsValue::from(
-            paths
-                .iter()
-                .map(|info| info.dist.map_or(JsValue::NULL, JsValue::from))
-                .collect::<Vec<_>>(),
-        );
-        let prevs = JsValue::from(
-            paths
-                .iter()
-                .map(|info| info.prev.map_or(JsValue::NULL, JsValue::from))
-                .collect::<Vec<_>>(),
-        );
-        JsValue::from(vec![dists, prevs])
-    }
-    fn dijkstra(&self, src: usize) -> Vec<PathInfo> {
         let mut results = vec![PathInfo::default(); self.nodes.len()];
         let mut bh = BinaryHeap::new();
         results[src].dist = Some(0);

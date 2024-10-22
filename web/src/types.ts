@@ -1,7 +1,7 @@
 export const Color = {
-  Green: 0,
-  White: 1,
-  Pink: 2,
+  Green: 1,
+  White: 2,
+  Pink: 3,
 } as const;
 export type Color = (typeof Color)[keyof typeof Color];
 

@@ -5,4 +5,9 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [react()],
   base: process.env.VITE_BASENAME || "/",
+  server: {
+    fs: {
+      allow: [".."],
+    },
+  },
 });
