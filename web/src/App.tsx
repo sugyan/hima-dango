@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import init, { Field, Graph } from "../pkg/hima_dango";
+import init, { WasmGraph } from "../../wasm/pkg/hima_dango_wasm";
 import DangoViewer from "./dango-viewer";
 import EditableState from "./editable-state";
 import Footer from "./footer";
@@ -11,7 +11,7 @@ function App() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [src, setSrc] = useState<Color[][]>();
   const [dst, setDst] = useState<Color[][]>();
-  const [graph, setGraph] = useState<Graph | null>(null);
+  const [graph, setGraph] = useState<WasmGraph | null>(null);
   const [results, setResults] = useState<Color[][][]>();
   const [isWasmInitialized, setIsWasmInitialized] = useState(false);
   useEffect(() => {
@@ -24,9 +24,7 @@ function App() {
     if (!isWasmInitialized) {
       return;
     }
-    const field = new Field(3, 3);
-    setGraph(field.make_graph(new Uint8Array([0, 0, 1, 1, 2, 2])));
-    field.free();
+    setGraph(new WasmGraph());
   }, [isWasmInitialized]);
   useEffect(() => {
     Object.entries({
