@@ -1,12 +1,19 @@
 use env_logger::{Builder, Env};
 use hima_dango::Field;
 use std::collections::BTreeMap;
+use std::num::NonZeroU8;
 use std::time::Instant;
 
 fn main() {
     Builder::from_env(Env::default().default_filter_or("info")).init();
 
-    let graph = Field::new(3, 3).make_graph(vec![0, 0, 1, 1, 2, 2]);
+    let graph = Field::<3>::new(3).make_graph(
+        // &[1, 2, 3, 4, 5, 6]
+        &[1, 1, 2, 2, 3, 3]
+            .iter()
+            .map(|&u| NonZeroU8::new(u).expect("non-zero"))
+            .collect::<Vec<_>>(),
+    );
     log::debug!("{} nodes, {} edges", graph.nodes_len(), graph.edges_len());
     let all_paths = {
         let now = Instant::now();
@@ -27,6 +34,6 @@ fn main() {
         }
     }
     for (distance, count) in counts {
-        println!("distance {distance:2}: {count:6}");
+        println!("distance {distance:2}: {count:7}");
     }
 }
